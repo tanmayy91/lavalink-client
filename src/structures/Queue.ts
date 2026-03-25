@@ -16,7 +16,7 @@ export class QueueSaver {
     constructor(options: ManagerQueueOptions) {
         this._ = options?.queueStore || new DefaultQueueStore();
         this.options = {
-            maxPreviousTracks: options?.maxPreviousTracks || 25,
+            maxPreviousTracks: options?.maxPreviousTracks ?? 25,
         };
     }
 
@@ -134,7 +134,7 @@ export class Queue {
     public current: Track | null = null;
     public options = { maxPreviousTracks: 25 };
     private readonly guildId: string = "";
-    private readonly QueueSaver: QueueSaver | null = null;
+    private readonly queueSaver: QueueSaver;
     private managerUtils = new ManagerUtils();
     private queueChanges: QueueChangesWatcher | null;
 
@@ -142,19 +142,29 @@ export class Queue {
      * Create a new Queue
      * @param guildId The guild ID
      * @param data The data to initialize the queue with
-     * @param QueueSaver The queue saver to use
+     * @param queueSaver The queue saver to use
      * @param queueOptions
      */
     constructor(
         guildId: string,
         data: Partial<StoredQueue> = {},
-        QueueSaver?: QueueSaver,
+        queueSaver?: QueueSaver,
         queueOptions?: ManagerQueueOptions,
     ) {
-        this.queueChanges = queueOptions?.queueChangesWatcher || null;
+        const maxPreviousTracks =
+            // prefer queueOptions, then queueSaver options, defaulting to 25; nullish coalescing preserves explicit 0
+            queueOptions?.maxPreviousTracks ?? queueSaver?.options?.maxPreviousTracks ?? 25;
+
+        const effectiveQueueOptions: ManagerQueueOptions = {
+            maxPreviousTracks,
+            queueStore: queueOptions?.queueStore,
+            queueChangesWatcher: queueOptions?.queueChangesWatcher,
+        };
+        this.queueChanges = effectiveQueueOptions.queueChangesWatcher || null;
         this.guildId = guildId;
-        this.QueueSaver = QueueSaver;
-        this.options.maxPreviousTracks = this.QueueSaver?.options?.maxPreviousTracks ?? this.options.maxPreviousTracks;
+        // Existing behavior: always ensure a QueueSaver exists (either provided or default)
+        this.queueSaver = queueSaver ?? new QueueSaver(effectiveQueueOptions);
+        this.options.maxPreviousTracks = maxPreviousTracks;
 
         this.current = this.managerUtils.isTrack(data.current) ? data.current : null;
         this.previous =
@@ -187,7 +197,7 @@ export class Queue {
         save: async () => {
             if (this.previous.length > this.options.maxPreviousTracks)
                 this.previous.splice(this.options.maxPreviousTracks, this.previous.length);
-            return await this.QueueSaver.set(this.guildId, this.utils.toJSON());
+            return await this.queueSaver.set(this.guildId, this.utils.toJSON());
         },
 
         /**
@@ -195,7 +205,7 @@ export class Queue {
          * @returns {void}
          */
         sync: async (override = true, dontSyncCurrent = true) => {
-            const data = await this.QueueSaver.get(this.guildId);
+            const data = await this.queueSaver.get(this.guildId);
             if (!data) throw new Error(`No data found to sync for guildId: ${this.guildId}`);
             if (!dontSyncCurrent && !this.current && this.managerUtils.isTrack(data.current))
                 this.current = data.current;
@@ -234,7 +244,7 @@ export class Queue {
         },
 
         destroy: async () => {
-            return await this.QueueSaver.delete(this.guildId);
+            return await this.queueSaver.delete(this.guildId);
         },
 
         /**

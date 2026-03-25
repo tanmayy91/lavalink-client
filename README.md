@@ -33,6 +33,7 @@
 - ✨ **Flexible Queue Stores:** Use the default in-memory store or bring your own (Redis, databases, etc.) to sync queues across multiple processes.
 - 🎶 **Unresolved Tracks:** Supports unresolved track objects, fetching full data only when a track is about to play, saving API requests and resources.
 - 🎚️ **Built-in Filters & EQ:** Easy-to-use management for audio filters and equalizers.
+- 🪪 **Normalized Track Metadata:** Titles, authors, durations (with a `length` alias), seekable/stream flags, and artwork are normalized with sensible fallbacks so you always get consistent info.
 - 🔍 **Advanced Queue Filtering:** Search and filter tracks in the queue by title, author, duration, and more with powerful query options.
 - ⚙️ **Advanced Player Options:** Fine-tune player behavior for disconnects, empty queues, volume handling, and more.
 - 🛡️ **Lavalink-Side Validation:** Ensures you only use filters, plugins, and sources that your Lavalink node actually supports.

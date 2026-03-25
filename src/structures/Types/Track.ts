@@ -56,6 +56,8 @@ export interface TrackInfo {
     author: string;
     /** The duration of the Track */
     duration: number;
+    /** Alias for duration to match Lavalink's `length` naming (set equal to duration when using ManagerUtils.buildTrack) */
+    length?: number;
     /** The URL of the artwork if available */
     artworkUrl: string | null;
     /** The URL (aka Link) of the Track called URI */

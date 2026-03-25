@@ -22,6 +22,10 @@ export const UnresolvedTrackSymbol = Symbol("LC-Track-Unresolved");
 export const QueueSymbol = Symbol("LC-Queue");
 export const NodeSymbol = Symbol("LC-Node");
 
+const DEFAULT_TITLE = "Unknown Title";
+const DEFAULT_AUTHOR = "Unknown Author";
+const DEFAULT_SOURCE = "unknown";
+
 /** @hidden */
 const escapeRegExp = (str: string): string => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -73,6 +77,16 @@ export class ManagerUtils {
             throw new RangeError("Argument 'data.encoded' must be present.");
         if (!data.info) throw new RangeError("Argument 'data.info' must be present.");
         try {
+            const duration = this.getDuration(data);
+            const title = data.info.title || DEFAULT_TITLE;
+            const author = data.info.author || DEFAULT_AUTHOR;
+            const uri = data.info.uri || "";
+            const sourceName = data.info.sourceName || DEFAULT_SOURCE;
+            const isrc = data.info.isrc ?? null;
+            const isStream = data.info.isStream ?? false;
+            // fallback: non-streams with positive duration are seekable; streams default to non-seekable when flag is missing
+            const isSeekable = data.info.isSeekable ?? (!isStream && duration > 0);
+
             let transformedRequester =
                 typeof requester === "object" ? this.getTransformedRequester(requester) : undefined;
 
@@ -88,15 +102,16 @@ export class ManagerUtils {
                 encoded: data.encoded,
                 info: {
                     identifier: data.info.identifier,
-                    title: data.info.title,
-                    author: data.info.author,
-                    duration: (data as Track).info?.duration || (data as LavalinkTrack).info?.length,
+                    title,
+                    author,
+                    duration,
+                    length: duration,
                     artworkUrl: data.info.artworkUrl || data.pluginInfo?.artworkUrl || (data as any).plugin?.artworkUrl,
-                    uri: data.info.uri,
-                    sourceName: data.info.sourceName,
-                    isSeekable: data.info.isSeekable,
-                    isStream: data.info.isStream,
-                    isrc: data.info.isrc,
+                    uri,
+                    sourceName,
+                    isSeekable,
+                    isStream,
+                    isrc,
                 },
                 userData: {
                     ...data.userData,
@@ -118,6 +133,14 @@ export class ManagerUtils {
             }
             throw new RangeError(`Argument "data" is not a valid track: ${error.message}`);
         }
+    }
+
+    private getDuration(trackLike: LavalinkTrack | Track): number {
+        const explicitDuration = (trackLike as Track).info?.duration;
+        if (typeof explicitDuration === "number") return explicitDuration;
+        const lavalinkLength = (trackLike as LavalinkTrack).info?.length;
+        if (typeof lavalinkLength === "number") return lavalinkLength;
+        return 0;
     }
 
     /**
