@@ -9,18 +9,18 @@
     <img alt="Made with TypeScript" src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white">
   </p>
   <p>
-    <a href="https://www.npmjs.com/package/lavalink-client">
-      <img src="https://img.shields.io/npm/v/lavalink-client.svg?maxAge=3600&style=for-the-badge&logo=npm&logoColor=red" alt="NPM Version" />
+    <a href="https://www.npmjs.com/package/nerox-llclient">
+      <img src="https://img.shields.io/npm/v/nerox-llclient.svg?maxAge=3600&style=for-the-badge&logo=npm&logoColor=red" alt="NPM Version" />
     </a>
-    <a href="https://www.npmjs.com/package/lavalink-client">
-      <img src="https://img.shields.io/npm/dt/lavalink-client.svg?maxAge=3600&style=for-the-badge&logo=npm&logoColor=red" alt="NPM Downloads" />
+    <a href="https://www.npmjs.com/package/nerox-llclient">
+      <img src="https://img.shields.io/npm/dt/nerox-llclient.svg?maxAge=3600&style=for-the-badge&logo=npm&logoColor=red" alt="NPM Downloads" />
     </a>
-    <a href="https://tomato6966.github.io/lavalink-client/">
+    <a href="https://gootephode.me/lava-client">
       <img src="https://img.shields.io/badge/Documentation-%230288D1.svg?style=for-the-badge&logo=gitbook&logoColor=white" alt="Get Started Now">
     </a>
   </p>
   <p>
-    <a href="https://www.npmjs.com/package/lavalink-client"><img src="https://nodei.co/npm/lavalink-client.png?downloads=true&stars=true" alt="NPM Install: lavalink-client" /></a>
+    <a href="https://www.npmjs.com/package/nerox-llclient"><img src="https://nodei.co/npm/nerox-llclient.png?downloads=true&stars=true" alt="NPM Install: nerox-llclient" /></a>
   </p>
 </div>
 
@@ -45,17 +45,17 @@
 
 ## 📦 Installation
 
-**Latest Stable Version: `v2.9.x`**
+**Latest Stable Version (nerox-llclient): `v1.0.0`**
 
 <details>
 <summary><strong>👉 via NPM</strong></summary>
 
 ```bash
 # Stable (install release)
-npm install --save lavalink-client
+npm install --save nerox-llclient
 
 # Development (Install github dev-branch)
-npm install --save tomato6966/lavalink-client
+npm install --save tanmayy91/lava-client
 ```
 
 </details>
@@ -65,10 +65,10 @@ npm install --save tomato6966/lavalink-client
 
 ```bash
 # Stable (install release)
-yarn add lavalink-client
+yarn add nerox-llclient
 
 # Development (Install github dev-branch)
-yarn add tomato6966/lavalink-client
+yarn add tanmayy91/lava-client
 ```
 
 </details>
@@ -78,10 +78,10 @@ yarn add tomato6966/lavalink-client
 
 ```bash
 # Stable (install release)
-bun add lavalink-client
+bun add nerox-llclient
 
 # Development (Install github dev-branch)
-bun add tomato6966/lavalink-client
+bun add tanmayy91/lava-client
 ```
 
 </details>
@@ -91,20 +91,20 @@ bun add tomato6966/lavalink-client
 
 ```bash
 # Stable (install release)
-pnpm add lavalink-client
+pnpm add nerox-llclient
 
 # Development (Install github dev-branch)
-pnpm add tomato6966/lavalink-client
+pnpm add tanmayy91/lava-client
 ```
 
 </details>
 
 ## 📖 Documentation & Guides
 
-- **[Full Documentation](https://tomato6966.github.io/lavalink-client/)** - Your starting point for everything.
-- **[Manager Events](https://tomato6966.github.io/lavalink-client/extra/manager-events)** - Handle track, player, and general client events.
-- **[NodeManager Events](https://tomato6966.github.io/lavalink-client/extra/node-events)** - Manage node connections, errors, and logs.
-- **[Session Resuming Guide](https://tomato6966.github.io/lavalink-client/extra/resuming)** - Learn how to implement session resuming for seamless restarts.
+- **[Full Documentation](https://gootephode.me/lava-client)** - Your starting point for everything.
+- **[Manager Events](https://gootephode.me/lava-client/extra/manager-events)** - Handle track, player, and general client events.
+- **[NodeManager Events](https://gootephode.me/lava-client/extra/node-events)** - Manage node connections, errors, and logs.
+- **[Session Resuming Guide](https://gootephode.me/lava-client/extra/resuming)** - Learn how to implement session resuming for seamless restarts.
 
 ---
 
@@ -371,7 +371,7 @@ This client powers various Discord bots:
 A minimal example to get you started quickly.
 
 ```typescript
-import { LavalinkManager } from "lavalink-client";
+import { LavalinkManager } from "nerox-llclient";
 import { Client, GatewayIntentBits } from "discord.js"; // example for a discord bot
 
 // Extend the Client type to include the lavalink manager
@@ -422,7 +422,7 @@ client.login(process.env.DISCORD_TOKEN);
 <summary><strong>🔩 Complete Configuration Example (almost all Options)</strong></summary>
 
 ```typescript
-import { LavalinkManager, QueueChangesWatcher, QueueStoreManager, StoredQueue } from "lavalink-client";
+import { LavalinkManager, QueueChangesWatcher, QueueStoreManager, StoredQueue } from "nerox-llclient";
 import { RedisClientType, createClient } from "redis";
 import { Client, GatewayIntentBits, User } from "discord.js";
 
@@ -618,7 +618,7 @@ Resuming allows your music bot to continue playback even after a restart.
 2.  **Listen for the `resumed` Event:** This event fires on a successful reconnect, providing all player data from Lavalink.
 3.  **Re-create Players:** Use the data from the `resumed` event and your own saved data (from a database/store) to rebuild the players and their queues.
 
-> 💡 **For a complete, working example, see the [official test bot's implementation](https://github.com/Tomato6966/lavalink-client/blob/main/testBot/Utils/handleResuming.ts).**
+> 💡 **For a complete, working example, see the [official test bot's implementation](https://github.com/tanmayy91/lava-client/blob/main/testBot/Utils/handleResuming.ts).**
 
 <details>
 <summary><strong>💡 Principle of how to enable **resuming**</strong></summary>

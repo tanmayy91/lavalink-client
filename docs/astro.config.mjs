@@ -7,8 +7,8 @@ import { optimizeTypeDocTables } from "./post_build.mjs";
 
 // https://astro.build/config
 export default defineConfig({
-    site: "https://tomato6966.github.io/",
-    base: "lavalink-client",
+    site: "https://gootephode.me/",
+    base: "lava-client",
     integrations: [
         starlight({
             title: "Lavalink Client",
@@ -23,7 +23,7 @@ export default defineConfig({
                 },
                 {
                     icon: "seti:github",
-                    href: "https://github.com/Tomato6966/lavalink-client",
+                    href: "https://github.com/tanmayy91/lava-client",
                     label: "Github Repository",
                 },
                 {
@@ -33,7 +33,7 @@ export default defineConfig({
                 },
             ],
             editLink: {
-                baseUrl: "https://github.com/Tomato6966/lavalink-client/tree/main",
+                baseUrl: "https://github.com/tanmayy91/lava-client/tree/main",
             },
             plugins: [
                 // Generate the documentation.
@@ -111,18 +111,18 @@ export default defineConfig({
                     ],
                 },
                 typeDocSidebarGroup,
-                {
-                    label: "GitHub",
-                    link: "https://github.com/Tomato6966/lavalink-client",
-                },
-                {
-                    label: "NPM",
-                    link: "https://npmjs.com/lavalink-client",
-                },
-                {
-                    label: "Example Bot",
-                    link: "https://github.com/Tomato6966/lavalink-client/tree/main/testBot",
-                },
+                 {
+                     label: "GitHub",
+                     link: "https://github.com/tanmayy91/lava-client",
+                 },
+                 {
+                     label: "NPM",
+                     link: "https://www.npmjs.com/package/nerox-llclient",
+                 },
+                 {
+                     label: "Example Bot",
+                     link: "https://github.com/tanmayy91/lava-client/tree/main/testBot",
+                 },
                 {
                     label: "Official Lavalink-Discord & - SUPPORT",
                     link: "https://discord.gg/lavalink-1082302532421943407",

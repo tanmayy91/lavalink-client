@@ -4,7 +4,7 @@ description: Learn how to use the lavalink@v4 Client.
 ---
 
 ```ts
-import { LavalinkManager } from "lavalink-client";
+import { LavalinkManager } from "nerox-llclient";
 import { Client, GatewayIntentBits } from "discord.js"; // example for a discord bot
 
 // you might want to extend the types of the client, to bind lavalink to it.
@@ -30,7 +30,7 @@ client.lavalink = new LavalinkManager({
     },
 });
 
-client.on("raw", (d) => client.lavalink.sendRawData(d)); // send raw data to lavalink-client to handle stuff
+client.on("raw", (d) => client.lavalink.sendRawData(d)); // send raw data to the client to handle stuff
 
 client.on("ready", () => {
     client.lavalink.init(client.user); // init lavalink
@@ -101,7 +101,7 @@ client.lavalink.nodeManager.on("error", (node, error, payload) => {
 > E.g:
 
 ```ts
-import { QueueChangesWatcher, LavalinkManager } from "lavalink-client";
+import { QueueChangesWatcher, LavalinkManager } from "nerox-llclient";
 
 class myCustomWatcher implements QueueChangesWatcher {
     constructor(client) {
@@ -140,7 +140,7 @@ client.lavalink = new LavalinkManager({
 
 ## Resuming full Example
 
-Full code sample: can be found on the [Testbot in here](https://github.com/Tomato6966/lavalink-client/blob/main/testBot/Utils/handleResuming.ts)
+Full code sample: can be found on the [Testbot in here](https://github.com/tanmayy91/lava-client/blob/main/testBot/Utils/handleResuming.ts)
 
 ```js
 // but here is the schema:
