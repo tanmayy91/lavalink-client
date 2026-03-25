@@ -45,7 +45,7 @@
 
 ## 📦 Installation
 
-**Latest Stable Version: `v1.0.0`**
+**Latest Stable Version (nerox-llclient): `v1.0.0`**
 
 <details>
 <summary><strong>👉 via NPM</strong></summary>
