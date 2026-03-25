@@ -68,6 +68,8 @@ import { NodeSymbol, queueTrackEnd, safeStringify } from "./Utils";
 const ERROR_BODY_PREVIEW_LIMIT = 200;
 const MIN_REQUEST_TIMEOUT_MS = 5000;
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
+const formatBodyPreview = (body: string) =>
+    body.length > ERROR_BODY_PREVIEW_LIMIT ? `${body.slice(0, ERROR_BODY_PREVIEW_LIMIT)}...` : body;
 /**
  * Lavalink Node creator class
  */
@@ -296,10 +298,14 @@ export class LavalinkNode {
         response: Response;
         options: RequestInit & { path: string; extraQueryUrlParams?: URLSearchParams };
     }> {
-        const hasCustomTimeout = typeof this.options.requestSignalTimeoutMS === "number";
-        const requestTimeoutMilliseconds = hasCustomTimeout
-            ? Math.max(MIN_REQUEST_TIMEOUT_MS, this.options.requestSignalTimeoutMS)
-            : DEFAULT_REQUEST_TIMEOUT_MS;
+        const customTimeout =
+            typeof this.options.requestSignalTimeoutMS === "number" ? this.options.requestSignalTimeoutMS : null;
+        const requestTimeoutMilliseconds =
+            customTimeout !== null
+                ? customTimeout > 0
+                    ? Math.max(MIN_REQUEST_TIMEOUT_MS, customTimeout)
+                    : customTimeout // <= 0 disables timeout
+                : DEFAULT_REQUEST_TIMEOUT_MS;
         const effectiveTimeout = requestTimeoutMilliseconds > 0 ? requestTimeoutMilliseconds : null;
 
         const options: RequestInit & { path: string; extraQueryUrlParams?: URLSearchParams } = {
@@ -357,7 +363,7 @@ export class LavalinkNode {
 
         if (!response.ok) {
             const body = await response.text().catch(() => "");
-            const bodyPreview = body ? ` | body: ${body.slice(0, ERROR_BODY_PREVIEW_LIMIT)}` : "";
+            const bodyPreview = body ? ` | body: ${formatBodyPreview(body)}` : "";
             throw new Error(
                 `Node request failed with status ${response.status} ${response.statusText} for ${options.path}${bodyPreview}`,
             );
@@ -547,7 +553,7 @@ export class LavalinkNode {
 
         if (!response.ok) {
             const body = await response.text().catch(() => "");
-            const preview = body ? ` | body: ${body.slice(0, ERROR_BODY_PREVIEW_LIMIT)}` : "";
+            const preview = body ? ` | body: ${formatBodyPreview(body)}` : "";
             throw new Error(`LavaSearch request failed (${response.status} ${response.statusText})${preview}`);
         }
 
