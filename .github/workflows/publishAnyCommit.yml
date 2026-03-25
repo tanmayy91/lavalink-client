@@ -30,4 +30,6 @@ jobs:
                     echo "NPM_TOKEN secret is required to publish." >&2
                     exit 1
                   fi
+                  # Explicitly configure npm to use the provided auth token
+                  npm config set //registry.npmjs.org/:_authToken "$NODE_AUTH_TOKEN"
                   npm publish --access public
