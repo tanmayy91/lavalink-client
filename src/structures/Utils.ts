@@ -73,15 +73,20 @@ export class ManagerUtils {
             throw new RangeError("Argument 'data.encoded' must be present.");
         if (!data.info) throw new RangeError("Argument 'data.info' must be present.");
         try {
-            const duration =
-                (data as Track).info?.duration ??
-                (data as LavalinkTrack).info?.length ??
-                (data as any).length ??
-                0;
+            const getDuration = (trackLike: LavalinkTrack | Track): number => {
+                const explicitDuration = (trackLike as Track).info?.duration;
+                if (typeof explicitDuration === "number") return explicitDuration;
+                const lavalinkLength = (trackLike as LavalinkTrack).info?.length;
+                if (typeof lavalinkLength === "number") return lavalinkLength;
+                return 0;
+            };
+
+            const duration = getDuration(data);
             const title = data.info.title || "Unknown Title";
             const author = data.info.author || "Unknown Author";
             const uri = data.info.uri || "";
             const sourceName = data.info.sourceName || "unknown";
+            const isrc = data.info.isrc ?? null;
 
             let transformedRequester =
                 typeof requester === "object" ? this.getTransformedRequester(requester) : undefined;
@@ -107,7 +112,7 @@ export class ManagerUtils {
                         sourceName,
                         isSeekable: data.info.isSeekable ?? false,
                         isStream: data.info.isStream ?? false,
-                        isrc: data.info.isrc ?? null,
+                        isrc,
                     },
                     userData: {
                         ...data.userData,

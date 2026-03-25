@@ -151,10 +151,16 @@ export class Queue {
         queueSaver?: QueueSaver,
         queueOptions?: ManagerQueueOptions,
     ) {
-        this.queueChanges = queueOptions?.queueChangesWatcher || null;
+        const effectiveQueueOptions: ManagerQueueOptions = {
+            maxPreviousTracks: queueOptions?.maxPreviousTracks ?? 25,
+            queueStore: queueOptions?.queueStore,
+            queueChangesWatcher: queueOptions?.queueChangesWatcher,
+        };
+        this.queueChanges = effectiveQueueOptions.queueChangesWatcher || null;
         this.guildId = guildId;
-        this.QueueSaver = queueSaver ?? new QueueSaver(queueOptions ?? {});
-        this.options.maxPreviousTracks = this.QueueSaver.options?.maxPreviousTracks ?? this.options.maxPreviousTracks;
+        this.QueueSaver = queueSaver ?? new QueueSaver(effectiveQueueOptions);
+        this.options.maxPreviousTracks =
+            effectiveQueueOptions.maxPreviousTracks ?? this.QueueSaver.options?.maxPreviousTracks ?? this.options.maxPreviousTracks;
 
         this.current = this.managerUtils.isTrack(data.current) ? data.current : null;
         this.previous =
