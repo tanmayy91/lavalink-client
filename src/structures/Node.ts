@@ -294,13 +294,15 @@ export class LavalinkNode {
         response: Response;
         options: RequestInit & { path: string; extraQueryUrlParams?: URLSearchParams };
     }> {
+        const requestTimeoutMs = this.options.requestSignalTimeoutMS ?? 10_000;
+
         const options: RequestInit & { path: string; extraQueryUrlParams?: URLSearchParams } = {
             path: `/${this.version}/${endpoint.startsWith("/") ? endpoint.slice(1) : endpoint}`,
             method: "GET",
             headers: {
                 Authorization: this.options.authorization,
             },
-            signal: AbortSignal.timeout(Math.max(5000, this.options.requestSignalTimeoutMS ?? 10_000)),
+            signal: requestTimeoutMs > 0 ? AbortSignal.timeout(Math.max(5000, requestTimeoutMs)) : undefined,
         };
 
         modify?.(options);
@@ -539,7 +541,7 @@ export class LavalinkNode {
 
         if (!response.ok) {
             const body = await response.text().catch(() => "");
-            const preview = body ? ` - ${body.slice(0, ERROR_BODY_PREVIEW_LIMIT)}` : "";
+            const preview = body ? ` | body: ${body.slice(0, ERROR_BODY_PREVIEW_LIMIT)}` : "";
             throw new Error(`LavaSearch request failed (${response.status} ${response.statusText})${preview}`);
         }
 
