@@ -66,6 +66,7 @@ import type {
 import { NodeSymbol, queueTrackEnd, safeStringify } from "./Utils";
 
 const ERROR_BODY_PREVIEW_LIMIT = 200;
+const MIN_REQUEST_TIMEOUT_MS = 5000;
 /**
  * Lavalink Node creator class
  */
@@ -294,7 +295,7 @@ export class LavalinkNode {
         response: Response;
         options: RequestInit & { path: string; extraQueryUrlParams?: URLSearchParams };
     }> {
-        const requestTimeoutMs = this.options.requestSignalTimeoutMS ?? 10_000;
+        const requestTimeoutMilliseconds = this.options.requestSignalTimeoutMS ?? 10_000;
 
         const options: RequestInit & { path: string; extraQueryUrlParams?: URLSearchParams } = {
             path: `/${this.version}/${endpoint.startsWith("/") ? endpoint.slice(1) : endpoint}`,
@@ -302,7 +303,10 @@ export class LavalinkNode {
             headers: {
                 Authorization: this.options.authorization,
             },
-            signal: requestTimeoutMs > 0 ? AbortSignal.timeout(Math.max(5000, requestTimeoutMs)) : undefined,
+            signal:
+                requestTimeoutMilliseconds > 0
+                    ? AbortSignal.timeout(Math.max(MIN_REQUEST_TIMEOUT_MS, requestTimeoutMilliseconds))
+                    : undefined,
         };
 
         modify?.(options);
