@@ -26,11 +26,11 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
               run: |
-                  TOKEN="${NODE_AUTH_TOKEN:-$NPM_TOKEN}"
+                  TOKEN="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"
                   if [ -z "$TOKEN" ]; then
                     echo "NPM_TOKEN secret is required to publish." >&2
                     exit 1
                   fi
                   # Explicitly configure npm to use the provided auth token
-                  npm config set //registry.npmjs.org/:_authToken "$TOKEN"
+                  npm config set //registry.npmjs.org/:_authToken "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"
                   npm publish --access public
