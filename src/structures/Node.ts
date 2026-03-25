@@ -64,6 +64,8 @@ import type {
     WebSocketClosedEvent,
 } from "./Types/Utils";
 import { NodeSymbol, queueTrackEnd, safeStringify } from "./Utils";
+
+const ERROR_BODY_PREVIEW_LIMIT = 200;
 /**
  * Lavalink Node creator class
  */
@@ -163,9 +165,13 @@ export class LavalinkNode {
     }
 
     private refreshPluginCache() {
-        this.pluginNameSet = new Set(
-            Array.isArray(this.info?.plugins) ? this.info.plugins.map((plugin) => plugin?.name).filter(Boolean) : [],
-        );
+        const pluginNames = Array.isArray(this.info?.plugins)
+            ? this.info.plugins
+                  .map((plugin) => plugin?.name)
+                  .filter((name): name is string => typeof name === "string" && name.length > 0)
+            : [];
+
+        this.pluginNameSet = new Set(pluginNames);
     }
 
     private hasPlugin(name: string): boolean {
@@ -294,7 +300,7 @@ export class LavalinkNode {
             headers: {
                 Authorization: this.options.authorization,
             },
-            signal: AbortSignal.timeout(Math.max(1000, this.options.requestSignalTimeoutMS ?? 10_000)),
+            signal: AbortSignal.timeout(Math.max(5000, this.options.requestSignalTimeoutMS ?? 10_000)),
         };
 
         modify?.(options);
@@ -343,7 +349,7 @@ export class LavalinkNode {
 
         if (!response.ok) {
             const body = await response.text().catch(() => "");
-            const bodyPreview = body ? ` | body: ${body.slice(0, 200)}` : "";
+            const bodyPreview = body ? ` | body: ${body.slice(0, ERROR_BODY_PREVIEW_LIMIT)}` : "";
             throw new Error(
                 `Node request failed with status ${response.status} ${response.statusText} for ${options.path}${bodyPreview}`,
             );
@@ -533,7 +539,7 @@ export class LavalinkNode {
 
         if (!response.ok) {
             const body = await response.text().catch(() => "");
-            const preview = body ? ` - ${body.slice(0, 200)}` : "";
+            const preview = body ? ` - ${body.slice(0, ERROR_BODY_PREVIEW_LIMIT)}` : "";
             throw new Error(`LavaSearch request failed (${response.status} ${response.statusText})${preview}`);
         }
 
