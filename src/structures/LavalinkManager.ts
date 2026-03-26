@@ -1,6 +1,7 @@
 import { EventEmitter } from "node:events";
 
 import { DebugEvents, DestroyReasons } from "./Constants";
+import { DefaultSources } from "./LavalinkManagerStatics";
 import { NodeManager } from "./NodeManager";
 import { Player } from "./Player";
 import { DefaultQueueStore } from "./Queue";
@@ -13,9 +14,9 @@ import type {
 } from "./Types/Manager";
 import type { LavalinkNodeOptions } from "./Types/Node";
 import type { PlayerOptions } from "./Types/Player";
-import type { ChannelDeletePacket, VoicePacket, VoiceServer, VoiceState } from "./Types/Utils";
-import { ManagerUtils, MiniMap, safeStringify } from "./Utils";
 import type { Track, UnresolvedTrack } from "./Types/Track";
+import type { ChannelDeletePacket, VoicePacket, VoiceServer, VoiceState, SearchPlatform } from "./Types/Utils";
+import { ManagerUtils, MiniMap, safeStringify } from "./Utils";
 
 const FALLBACK_NODE_PRESETS: Array<Record<string, unknown>> = [
     {
@@ -50,6 +51,21 @@ const FALLBACK_NODE_PRESETS: Array<Record<string, unknown>> = [
         priority: 4,
     },
 ];
+
+const DEFAULT_SPOTIFY_CONFIG = {
+    clientId: "d62dc6e25a374aad8f035111f351ea85",
+    clientSecret: "c807e75e805d4001be9fd81e4afd6272",
+    searchLimit: 10,
+    albumPageLimit: 1,
+    searchMarket: "IN",
+    playlistPageLimit: 1,
+};
+
+const DEFAULT_APPLE_CONFIG = {
+    imageWidth: 600,
+    imageHeight: 900,
+    countryCode: "us",
+};
 
 function normalizeHostPort(rawHost: string | undefined, rawUrl: string | undefined): { host: string; port: number } {
     const candidate = rawHost || rawUrl || "";
@@ -157,6 +173,17 @@ export class LavalinkManager<CustomPlayerT extends Player = Player> extends Even
      * @returns
      */
     private applyOptions(options: ManagerOptions<CustomPlayerT>) {
+        const resolvedDefaultSearchPlatform: SearchPlatform = (() => {
+            const provided = options?.defaultSearchEngine?.toLowerCase?.().trim();
+            if (provided) {
+                const mapped = DefaultSources[provided as keyof typeof DefaultSources];
+                if (typeof mapped === "string") return mapped as SearchPlatform;
+                if (Array.isArray(mapped) && typeof mapped[0] === "string") return mapped[0] as SearchPlatform;
+                if (!mapped && DefaultSources.youtube) return DefaultSources.youtube as SearchPlatform;
+            }
+            return (options?.playerOptions?.defaultSearchPlatform as SearchPlatform) ?? ("ytsearch" as SearchPlatform);
+        })();
+
         const providedNodes =
             Array.isArray(options?.nodes) && options.nodes?.length
                 ? options.nodes.filter((node) => this.utils.isNodeOptions(node))
@@ -180,7 +207,7 @@ export class LavalinkManager<CustomPlayerT extends Player = Player> extends Even
             playerOptions: {
                 applyVolumeAsFilter: options?.playerOptions?.applyVolumeAsFilter ?? false,
                 clientBasedPositionUpdateInterval: options?.playerOptions?.clientBasedPositionUpdateInterval ?? 100,
-                defaultSearchPlatform: options?.playerOptions?.defaultSearchPlatform ?? "ytsearch",
+                defaultSearchPlatform: resolvedDefaultSearchPlatform,
                 allowCustomSources: options?.playerOptions?.allowCustomSources ?? false,
                 onDisconnect: {
                     destroyPlayer: options?.playerOptions?.onDisconnect?.destroyPlayer ?? true,
@@ -202,6 +229,15 @@ export class LavalinkManager<CustomPlayerT extends Player = Player> extends Even
                 },
                 enforceSponsorBlockRequestForEventEnablement:
                     options?.playerOptions?.enforceSponsorBlockRequestForEventEnablement ?? true,
+            },
+            defaultSearchEngine: options?.defaultSearchEngine ?? "youtube",
+            spotifyConfig: {
+                ...DEFAULT_SPOTIFY_CONFIG,
+                ...options?.spotifyConfig,
+            },
+            appleConfig: {
+                ...DEFAULT_APPLE_CONFIG,
+                ...options?.appleConfig,
             },
             linksWhitelist: options?.linksWhitelist ?? [],
             linksBlacklist: options?.linksBlacklist ?? [],

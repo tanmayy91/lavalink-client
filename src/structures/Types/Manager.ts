@@ -324,6 +324,21 @@ export interface ManagerPlayerOptions<CustomPlayerT extends Player = Player> {
     enforceSponsorBlockRequestForEventEnablement?: boolean;
 }
 
+export interface SpotifyConfig {
+    clientId: string;
+    clientSecret: string;
+    searchLimit?: number;
+    albumPageLimit?: number;
+    searchMarket?: string;
+    playlistPageLimit?: number;
+}
+
+export interface AppleConfig {
+    imageWidth?: number;
+    imageHeight?: number;
+    countryCode?: string;
+}
+
 export type DeepRequired<T> = {
     [K in keyof T]-?: NonNullable<T[K]> extends object ? DeepRequired<NonNullable<T[K]>> : NonNullable<T[K]>;
 };
@@ -358,6 +373,12 @@ export interface ManagerOptions<CustomPlayerT extends Player = Player> {
     autoSkipOnResolveError?: boolean;
     /** If it should emit only new (unique) songs and not when a looping track (or similar) is plaid, default false */
     emitNewSongsOnly?: boolean;
+    /** Optional default search engine alias, e.g. "youtube" maps to ytsearch */
+    defaultSearchEngine?: string;
+    /** Optional spotify configuration defaults */
+    spotifyConfig?: SpotifyConfig;
+    /** Optional apple music configuration defaults */
+    appleConfig?: AppleConfig;
     /** Only allow link requests with links either matching some of that regExp or including some of that string */
     linksWhitelist?: (RegExp | string)[];
     /** Never allow link requests with links either matching some of that regExp or including some of that string (doesn't even allow if it's whitelisted) */
