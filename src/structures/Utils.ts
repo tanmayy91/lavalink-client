@@ -425,11 +425,14 @@ export class ManagerUtils {
         if (!node._checkForSources) return;
 
         // missing links: beam.pro local getyarn.io clypit pornhub reddit ocreamix soundgasm
-        if (
-            (SourceLinksRegexes.YoutubeMusicRegex.test(queryString) ||
-                SourceLinksRegexes.YoutubeRegex.test(queryString)) &&
-            !node.info?.sourceManagers?.includes("youtube")
-        ) {
+        const hasYoutube = node.info?.sourceManagers?.includes("youtube") ?? false;
+        const hasYoutubeMusic = node.info?.sourceManagers?.includes("youtubemusic") ?? false;
+        if (SourceLinksRegexes.YoutubeMusicRegex.test(queryString) && !(hasYoutube || hasYoutubeMusic)) {
+            throw new Error(
+                "Query / Link Provided for this Source but Lavalink Node has neither 'youtube' nor 'youtubemusic' enabled",
+            );
+        }
+        if (SourceLinksRegexes.YoutubeRegex.test(queryString) && !hasYoutube) {
             throw new Error("Query / Link Provided for this Source but Lavalink Node has not 'youtube' enabled");
         }
         if (
@@ -665,8 +668,15 @@ export class ManagerUtils {
         if (source === "ymsearch" && !node.info?.sourceManagers?.includes("yandexmusic")) {
             throw new Error("Lavalink Node has not 'yandexmusic' enabled, which is required to have 'ymsearch' work");
         }
-        if (source === "ytmsearch" && !node.info?.sourceManagers?.includes("youtube")) {
-            throw new Error("Lavalink Node has not 'youtube' enabled, which is required to have 'ytmsearch' work");
+        if (
+            source === "ytmsearch" &&
+            !(
+                node.info?.sourceManagers?.includes("youtube") || node.info?.sourceManagers?.includes("youtubemusic")
+            )
+        ) {
+            throw new Error(
+                "Lavalink Node has neither 'youtube' nor 'youtubemusic' enabled, which is required to have 'ytmsearch' work",
+            );
         }
         if (source === "ytsearch" && !node.info?.sourceManagers?.includes("youtube")) {
             throw new Error("Lavalink Node has not 'youtube' enabled, which is required to have 'ytsearch' work");
