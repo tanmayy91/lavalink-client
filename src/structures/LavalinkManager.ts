@@ -15,6 +15,64 @@ import type { LavalinkNodeOptions } from "./Types/Node";
 import type { PlayerOptions } from "./Types/Player";
 import type { ChannelDeletePacket, VoicePacket, VoiceServer, VoiceState } from "./Types/Utils";
 import { ManagerUtils, MiniMap, safeStringify } from "./Utils";
+
+const FALLBACK_NODE_PRESETS: Array<Record<string, unknown>> = [
+    {
+        name: "Nerox-Main",
+        url: "lava-v4.ajieblogs.eu.org:80",
+        auth: "https://dsc.gg/ajidevserver",
+        secure: false,
+        priority: 1,
+    },
+    {
+        identifier: "nerox-cloud",
+        password: "youshallnotpass",
+        host: "lavalink.jirayu.net",
+        port: 13592,
+        secure: false,
+        priority: 2,
+    },
+    {
+        identifier: "Tapao NodeLink SG2 - v4",
+        password: "nyxbot.app/support",
+        host: "sg2-nodelink.nyxbot.app",
+        port: 3000,
+        secure: false,
+        priority: 3,
+    },
+    {
+        identifier: "AneFaiz - v4",
+        password: "https://discord.gg/mjS5J2K3ep",
+        host: "lava-v4.millohost.my.id",
+        port: 443,
+        secure: true,
+        priority: 4,
+    },
+];
+
+function normalizeHostPort(rawHost: string | undefined, rawUrl: string | undefined): { host: string; port: number } {
+    const candidate = rawHost || rawUrl || "";
+    const prefixed = /^https?:\/\//.test(candidate) ? candidate : `http://${candidate}`;
+    try {
+        const url = new URL(prefixed);
+        const port = url.port ? Number(url.port) : 80;
+        return { host: url.hostname, port: port || 80 };
+    } catch {
+        return { host: candidate || "localhost", port: 80 };
+    }
+}
+
+function presetToNodeOptions(preset: Record<string, unknown>): LavalinkNodeOptions {
+    const { host, port } = normalizeHostPort(preset.host as string, preset.url as string);
+    return {
+        id: (preset.name as string) || (preset.identifier as string) || `${host}:${port}`,
+        host,
+        port: typeof port === "number" && !Number.isNaN(port) ? port : 80,
+        secure: Boolean(preset.secure),
+        authorization: (preset.auth as string) || (preset.password as string) || "youshallnotpass",
+        priority: (preset.priority as number) || 1,
+    };
+}
 export class LavalinkManager<CustomPlayerT extends Player = Player> extends EventEmitter {
     /**
      * Emit an event
@@ -98,6 +156,15 @@ export class LavalinkManager<CustomPlayerT extends Player = Player> extends Even
      * @returns
      */
     private applyOptions(options: ManagerOptions<CustomPlayerT>) {
+        const providedNodes =
+            Array.isArray(options?.nodes) && options.nodes?.length
+                ? options.nodes.filter((node) => this.utils.isNodeOptions(node))
+                : [];
+        const nodesToUse =
+            providedNodes.length > 0
+                ? providedNodes
+                : FALLBACK_NODE_PRESETS.map((preset) => presetToNodeOptions(preset));
+
         const optionsToAssign: RequiredManagerOptions<CustomPlayerT> = {
             ...options,
             client: {
@@ -107,7 +174,7 @@ export class LavalinkManager<CustomPlayerT extends Player = Player> extends Even
             },
             sendToShard: options?.sendToShard,
             autoMove: options?.autoMove ?? false,
-            nodes: options?.nodes as DeepRequired<LavalinkNodeOptions>[],
+            nodes: nodesToUse as DeepRequired<LavalinkNodeOptions>[],
             playerClass: (options?.playerClass ?? Player) as unknown as DeepRequired<CustomPlayerT>,
             playerOptions: {
                 applyVolumeAsFilter: options?.playerOptions?.applyVolumeAsFilter ?? false,

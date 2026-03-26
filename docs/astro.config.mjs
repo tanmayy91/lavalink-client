@@ -111,18 +111,18 @@ export default defineConfig({
                     ],
                 },
                 typeDocSidebarGroup,
-                 {
-                     label: "GitHub",
-                     link: "https://github.com/tanmayy91/lava-client",
-                 },
-                 {
-                     label: "NPM",
-                     link: "https://www.npmjs.com/package/nerox-llclient",
-                 },
-                 {
-                     label: "Example Bot",
-                     link: "https://github.com/tanmayy91/lava-client/tree/main/testBot",
-                 },
+                {
+                    label: "GitHub",
+                    link: "https://github.com/tanmayy91/lava-client",
+                },
+                {
+                    label: "NPM",
+                    link: "https://www.npmjs.com/package/nerox-llclient",
+                },
+                {
+                    label: "Example Bot",
+                    link: "https://github.com/tanmayy91/lava-client/tree/main/testBot",
+                },
                 {
                     label: "Official Lavalink-Discord & - SUPPORT",
                     link: "https://discord.gg/lavalink-1082302532421943407",

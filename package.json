@@ -13,14 +13,12 @@
         "typescript"
     ],
     "homepage": "https://gootephode.me/lava-client",
-    
     "license": "MIT",
     "author": {
         "name": "Tanmay",
         "url": "https://github.com/ogtanmay/"
     },
     "contributors": [],
-    
     "directories": {
         "lib": "src"
     },

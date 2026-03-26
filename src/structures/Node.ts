@@ -138,7 +138,7 @@ export class LavalinkNode {
     /** The Socket of the Lavalink */
     private socket: WebSocket | null = null;
     /** Version of what the Lavalink Server should be */
-    private version = "v4";
+    private version: "v3" | "v4" = "v4";
 
     /**
      * Returns the LavalinkManager of the Node
@@ -260,6 +260,13 @@ export class LavalinkNode {
                 pluginValidations: options?.autoChecks?.pluginValidations ?? true,
             },
         };
+
+        if (options?.version) {
+            const normalizedVersion = options.version.toLowerCase();
+            if (normalizedVersion !== "v3" && normalizedVersion !== "v4")
+                throw new SyntaxError(`Invalid Lavalink version "${options.version}", expected "v3" or "v4"`);
+            this.version = normalizedVersion as "v3" | "v4";
+        }
 
         if (
             this.options.nodeType === "NodeLink" &&
@@ -702,9 +709,15 @@ export class LavalinkNode {
             this.sessionId = this.options.sessionId || sessionId;
         }
 
+        const wsPath = (this.options.wsPath || `/${this.version}/websocket`).startsWith("/")
+            ? this.options.wsPath || `/${this.version}/websocket`
+            : `/${this.options.wsPath}`;
+
         this.socket = new WebSocket(
-            `ws${this.options.secure ? "s" : ""}://${this.options.host}:${this.options.port}/v4/websocket`,
-            { headers },
+            `ws${this.options.secure ? "s" : ""}://${this.options.host}:${this.options.port}${wsPath}`,
+            {
+                headers,
+            },
         );
         this.socket.on("open", this.open.bind(this));
         this.socket.on("close", (code, reason) => this.close(code, reason?.toString()));

@@ -25,12 +25,21 @@ export type SponsorBlockSegment =
 export interface LavalinkNodeOptions {
     /** Specify the Node-Type of this node. Default: Lavalink */
     nodeType?: NodeTypes;
+    /** Lavalink API version path (e.g. v3 or v4). Defaults to v4. */
+    version?: "v3" | "v4";
     /** The Lavalink Server-Ip / Domain-URL */
     host: string;
     /** The Lavalink Connection Port */
     port: number;
     /** The Lavalink Password / Authorization-Key */
     authorization: string;
+    /** Optional priority helper for custom node selection strategies. */
+    priority?: number;
+    /**
+     * Optional websocket path override (must start with "/").
+     * Defaults to `/${version}/websocket`.
+     */
+    wsPath?: string;
     /** Does the Server use ssl (https) */
     secure?: boolean;
     /** RESUME THE PLAYER? by providing a sessionid on the node-creation */
